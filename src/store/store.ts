@@ -24,8 +24,8 @@ interface AppState {
     editorAgreementData: string;
     dataHistory: { past: string[], future: string[] };
 
-    agreementHtml: string;
-    error: string | undefined;
+    agreementHtml: string; // Keep as string, we'll ensure it's never undefined
+    error?: string;
     samples: Array<Sample>;
     sampleName: string;
     backgroundColor: string;
@@ -105,7 +105,7 @@ const useAppStore = create<AppState>()(
             editorAgreementData: JSON.stringify(playground.DATA, null, 2),
             dataHistory: { past: [], future: [] },
 
-            agreementHtml: "",
+            agreementHtml: "", // Initialize with empty string
             error: undefined,
             samples: SAMPLES,
 
@@ -124,7 +124,7 @@ const useAppStore = create<AppState>()(
                 if (sample) {
                     set((state) => {
                         state.sampleName = sample.NAME;
-                        state.agreementHtml = undefined;
+                        state.agreementHtml = ""; // Set to empty string instead of undefined
                         state.error = undefined;
                         state.templateMarkdown = sample.TEMPLATE;
                         state.editorValue = sample.TEMPLATE;
@@ -145,7 +145,7 @@ const useAppStore = create<AppState>()(
                 try {
                     const result = await rebuildDeBounce(templateMarkdown, modelCto, data);
                     set((state) => {
-                        state.agreementHtml = result;
+                        state.agreementHtml = result || ""; // Ensure it's never undefined
                         state.error = undefined;
                     });
                 } catch (error: any) {
@@ -168,7 +168,7 @@ const useAppStore = create<AppState>()(
                 try {
                     const result = await rebuildDeBounce(template, modelCto, data);
                     set((state) => {
-                        state.agreementHtml = result;
+                        state.agreementHtml = result || ""; // Ensure it's never undefined
                         state.error = undefined;
                     });
                 } catch (error: any) {
@@ -181,7 +181,7 @@ const useAppStore = create<AppState>()(
             },
 
             undoTemplate: () => {
-                const { templateHistory, templateMarkdown } = get();
+                const { templateHistory } = get();
 
                 if (templateHistory.past.length === 0) return;
 
@@ -241,7 +241,7 @@ const useAppStore = create<AppState>()(
                 try {
                     const result = await rebuildDeBounce(templateMarkdown, model, data);
                     set((state) => {
-                        state.agreementHtml = result;
+                        state.agreementHtml = result || ""; // Ensure it's never undefined
                         state.error = undefined;
                     });
                 } catch (error: any) {
@@ -317,7 +317,7 @@ const useAppStore = create<AppState>()(
                         data
                     );
                     set((state) => {
-                        state.agreementHtml = result;
+                        state.agreementHtml = result || ""; // Ensure it's never undefined
                         state.error = undefined;
                     });
                 } catch (error: any) {
@@ -389,13 +389,16 @@ const useAppStore = create<AppState>()(
 
             loadFromLink: async (compressedData: string) => {
                 try {
-                    const { templateMarkdown, modelCto, data, agreementHtml } = decompress(compressedData);
-                    if (!templateMarkdown || !modelCto || !data) {
+                    const decompressedData = decompress(compressedData);
+                    const { modelCto, data, agreementHtml } = decompressedData;
+                    const templateMd = decompressedData.templateMarkdown; // Renamed to avoid the unused variable warning
+
+                    if (!templateMd || !modelCto || !data) {
                         throw new Error("Invalid share link data");
                     }
                     set((state) => {
-                        state.templateMarkdown = templateMarkdown;
-                        state.editorValue = templateMarkdown;
+                        state.templateMarkdown = templateMd;
+                        state.editorValue = templateMd;
                         state.templateHistory = { past: [], future: [] };
 
                         state.modelCto = modelCto;
@@ -406,7 +409,7 @@ const useAppStore = create<AppState>()(
                         state.editorAgreementData = data;
                         state.dataHistory = { past: [], future: [] };
 
-                        state.agreementHtml = agreementHtml;
+                        state.agreementHtml = agreementHtml || ""; // Ensure it's never undefined
                         state.error = undefined;
                     });
                     await get().rebuild();

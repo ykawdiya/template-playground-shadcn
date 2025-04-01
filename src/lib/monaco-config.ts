@@ -108,6 +108,10 @@ export function configureMonacoEditor() {
             rules: [],
             colors: {}
         });
+
+        // Actually use the isDarkTheme parameter to set the current theme
+        const currentTheme = isDarkTheme ? 'templatemark-dark' : 'templatemark-light';
+        monaco.editor.setTheme(currentTheme);
     }
 
     return { configureEditor, setEditorTheme };

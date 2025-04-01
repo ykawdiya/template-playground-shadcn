@@ -21,21 +21,19 @@ export function PreviewComponent({ loading = false }: PreviewComponentProps) {
     const backgroundColor = useAppStore((state) => state.backgroundColor);
     const textColor = useAppStore((state) => state.textColor);
 
-    const copyHtml = () => {
-        if (agreementHtml && navigator.clipboard) {
-            navigator.clipboard.writeText(agreementHtml)
-                .then(() => {
-                    // You could add a toast notification here
-                    console.log("HTML copied to clipboard");
-                })
-                .catch(err => {
-                    console.error("Failed to copy HTML: ", err);
-                });
+    const copyHtml = async (): Promise<void> => {
+        if (agreementHtml && typeof navigator !== 'undefined' && navigator.clipboard) {
+            try {
+                await navigator.clipboard.writeText(agreementHtml);
+                console.log("HTML copied to clipboard");
+            } catch (err) {
+                console.error("Failed to copy HTML: ", err);
+            }
         }
     };
 
-    const downloadHtml = () => {
-        if (agreementHtml && typeof window !== 'undefined') {
+    const downloadHtml = (): void => {
+        if (agreementHtml && typeof window !== 'undefined' && typeof document !== 'undefined') {
             const blob = new Blob([agreementHtml], { type: "text/html" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");

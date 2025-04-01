@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Editor } from "@monaco-editor/react";
 import useAppStore from "@/store/store";
 import { useTheme } from "@/hooks/use-theme";
