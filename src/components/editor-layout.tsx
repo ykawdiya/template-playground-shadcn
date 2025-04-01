@@ -21,8 +21,10 @@ export function EditorLayout({
     const [rightSize, setRightSize] = useLocalStorage("editor-right-size", 100 - defaultLeftWidth);
 
     const onLayout = (sizes: number[]) => {
-        setLeftSize(sizes[0]);
-        setRightSize(sizes[1]);
+        if (sizes.length >= 2) {
+            setLeftSize(sizes[0]);
+            setRightSize(sizes[1]);
+        }
     };
 
     return (

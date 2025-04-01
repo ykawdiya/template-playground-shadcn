@@ -1,4 +1,3 @@
-import React from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertTriangle } from "lucide-react";
 import useAppStore from "@/store/store";
@@ -33,8 +32,8 @@ export default function ErrorDisplay() {
                 <span>{cleanError}</span>
                 {(line || column) && (
                     <span className="text-xs mt-1">
-            {line && `Line ${line}`} {column && `Column ${column}`}
-          </span>
+                        {line && `Line ${line}`} {column && `Column ${column}`}
+                    </span>
                 )}
             </AlertDescription>
         </Alert>

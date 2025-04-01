@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,15 +21,21 @@ export function PreviewComponent({ loading = false }: PreviewComponentProps) {
     const backgroundColor = useAppStore((state) => state.backgroundColor);
     const textColor = useAppStore((state) => state.textColor);
 
-    const copyHtml = async () => {
-        if (agreementHtml) {
-            await navigator.clipboard.writeText(agreementHtml);
-            // Add a toast notification here
+    const copyHtml = () => {
+        if (agreementHtml && navigator.clipboard) {
+            navigator.clipboard.writeText(agreementHtml)
+                .then(() => {
+                    // You could add a toast notification here
+                    console.log("HTML copied to clipboard");
+                })
+                .catch(err => {
+                    console.error("Failed to copy HTML: ", err);
+                });
         }
     };
 
     const downloadHtml = () => {
-        if (agreementHtml) {
+        if (agreementHtml && typeof window !== 'undefined') {
             const blob = new Blob([agreementHtml], { type: "text/html" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -107,7 +113,7 @@ export function PreviewComponent({ loading = false }: PreviewComponentProps) {
                 ) : mode === "preview" ? (
                     <div
                         className="p-6 prose dark:prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ __html: agreementHtml }}
+                        dangerouslySetInnerHTML={{ __html: agreementHtml || "" }}
                         style={{
                             color: textColor,
                             backgroundColor: backgroundColor,
@@ -117,8 +123,8 @@ export function PreviewComponent({ loading = false }: PreviewComponentProps) {
                     />
                 ) : (
                     <pre className="p-6 text-sm font-mono bg-muted/30 overflow-auto h-full whitespace-pre-wrap">
-            {agreementHtml}
-          </pre>
+                        {agreementHtml || ""}
+                    </pre>
                 )}
             </CardContent>
         </Card>
