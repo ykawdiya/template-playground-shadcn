@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Routes, Route, useSearchParams, useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/hooks/use-theme";
 import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
+import Footer from "@/components/Footer"; // Fixed casing
 import { EditorLayout } from "@/components/editor-layout";
 import { EditorTabs } from "@/components/editor-tabs";
 import { PreviewComponent } from "@/components/preview-component";

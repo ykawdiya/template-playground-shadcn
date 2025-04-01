@@ -1,7 +1,7 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-export function cn(...inputs: ClassValue[]) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-call
-    return twMerge(clsx(inputs))
+// This utility function combines Tailwind CSS classes with proper type checking
+export function cn(...inputs: ClassValue[]): string {
+    return twMerge(clsx(inputs));
 }

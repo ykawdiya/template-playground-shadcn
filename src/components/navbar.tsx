@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
     Github,
     Menu,
-    Search,
     ChevronDown,
     HelpCircle,
     PanelLeft,
@@ -40,8 +39,8 @@ export function Navbar({ scrollToFooter }: NavbarProps) {
                             className="h-6 w-auto dark:invert"
                         />
                         <span className="hidden font-semibold md:inline-block">
-              Template Playground
-            </span>
+                            Template Playground
+                        </span>
                     </Link>
 
                     <nav className="hidden md:flex items-center space-x-4">
@@ -105,26 +104,26 @@ export function Navbar({ scrollToFooter }: NavbarProps) {
                         </Button>
                     )}
 
-
-                    href="https://github.com/accordproject/template-playground"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="GitHub"
+                    <a
+                        href="https://github.com/accordproject/template-playground"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="GitHub"
                     >
-                    <Button variant="ghost" size="icon">
-                        <Github className="h-5 w-5" />
-                        <span className="sr-only">GitHub</span>
-                    </Button>
-                </a>
+                        <Button variant="ghost" size="icon">
+                            <Github className="h-5 w-5" />
+                            <span className="sr-only">GitHub</span>
+                        </Button>
+                    </a>
 
-                <Button variant="ghost" size="icon" className="md:hidden">
-                    <Menu className="h-5 w-5" />
-                    <span className="sr-only">Menu</span>
-                </Button>
+                    <Button variant="ghost" size="icon" className="md:hidden">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Menu</span>
+                    </Button>
+                </div>
             </div>
-        </div>
-</header>
-);
+        </header>
+    );
 }
 
 export default Navbar;
