@@ -1,51 +1,40 @@
 import { useEffect, useState } from "react";
-import { App as AntdApp, Layout, Row, Col, Collapse, Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
 import { Routes, Route, useSearchParams, useNavigate } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import tour from "./components/Tour";
-import AgreementData from "./editors/editorsContainer/AgreementData";
-import LearnNow from "./pages/LearnNow";
-import AgreementHtml from "./AgreementHtml";
-import Errors from "./utils/helpers/Errors";
-import TemplateMarkdown from "./editors/editorsContainer/TemplateMarkdown";
-import TemplateModel from "./editors/editorsContainer/TemplateModel";
-import useAppStore from "./store/store";
-import SampleDropdown from "./components/SampleDropdown";
-import UseShare from "./components/UseShare";
-import LearnContent from "./components/Content";
-import FloatingFAB from "./components/FabButton";
-import ResizableContainer from "./components/ResizableContainer";
+import { ThemeProvider } from "@/hooks/use-theme";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
+import { EditorLayout } from "@/components/editor-layout";
+import { EditorTabs } from "@/components/editor-tabs";
+import { PreviewComponent } from "@/components/preview-component";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Share2, Loader2 } from "lucide-react";
+import useAppStore from "@/store/store";
+import LearnPage from "@/pages/LearnNow";
+import FloatingHelp from "@/components/FloatingHelp";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
-const { Content } = Layout;
-
-const App = () => {
+export default function App() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [loading, setLoading] = useState(true);
+
+  // Store state
   const init = useAppStore((state) => state.init);
   const loadFromLink = useAppStore((state) => state.loadFromLink);
-  const backgroundColor = useAppStore((state) => state.backgroundColor);
-  const textColor = useAppStore((state) => state.textColor);
-  const [activePanel, setActivePanel] = useState<string | string[]>();
-  const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
+  const loadSample = useAppStore((state) => state.loadSample);
+  const samples = useAppStore((state) => state.samples);
+  const sampleName = useAppStore((state) => state.sampleName);
+  const generateShareableLink = useAppStore((state) => state.generateShareableLink);
+  const error = useAppStore((state) => state.error);
 
-  const scrollToFooter = () => {
-    const exploreContent = document.getElementById("footer");
-    if (exploreContent) {
-      exploreContent.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
-  const onChange = (key: string | string[]) => {
-    setActivePanel(key);
-  };
-
+  // Handle initialization
   useEffect(() => {
     const initializeApp = async () => {
       try {
         setLoading(true);
         const compressedData = searchParams.get("data");
+
         if (compressedData) {
           await loadFromLink(compressedData);
           if (window.location.pathname !== "/") {
@@ -60,165 +49,103 @@ const App = () => {
         setLoading(false);
       }
     };
+
     initializeApp();
   }, [init, loadFromLink, searchParams, navigate]);
 
-  useEffect(() => {
-    const style = document.createElement("style");
-    style.innerHTML = `
-      .ant-collapse-header {
-        color: ${textColor} !important;
-      }
-      .ant-collapse-content {
-        background-color: ${backgroundColor} !important;
-      }
-      .ant-collapse-content-active {
-        background-color: ${backgroundColor} !important;
-      }
-    `;
-    document.head.appendChild(style);
-
-    return () => {
-      document.head.removeChild(style);
-    };
-  }, [backgroundColor, textColor]);
-
-  useEffect(() => {
-    const startTour = async () => {
-      try {
-        await tour.start();
-        localStorage.setItem("hasVisited", "true");
-      } catch (error) {
-        console.error("Tour failed to start:", error);
-      }
-    };
-
-    const showTour = searchParams.get("showTour") === "true";
-    if (showTour || !localStorage.getItem("hasVisited")) {
-      startTour();
+  // Handle template selection
+  const handleTemplateChange = async (value: string) => {
+    try {
+      setLoading(true);
+      await loadSample(value);
+    } catch (error) {
+      console.error("Failed to load sample:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [searchParams]);
+  };
 
-  const panels = [
-    {
-      key: "templateMark",
-      label: "TemplateMark",
-      children: <TemplateMarkdown />,
-    },
-    {
-      key: "model",
-      label: "Concerto Model",
-      children: <TemplateModel />,
-    },
-    {
-      key: "data",
-      label: "Preview Data",
-      children: <AgreementData />,
-    },
-  ];
+  // Handle share button click
+  const handleShare = () => {
+    try {
+      const link = generateShareableLink();
+      navigator.clipboard.writeText(link);
+      // Add toast notification here
+    } catch (error) {
+      console.error("Failed to share:", error);
+    }
+  };
+
+  // Helper function for footer scroll
+  const scrollToFooter = () => {
+    document.getElementById("footer")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  if (loading) {
+    return (
+        <ThemeProvider>
+          <div className="h-screen w-full flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="h-10 w-10 animate-spin text-primary" />
+              <p className="text-lg font-medium">Loading Template Playground...</p>
+            </div>
+          </div>
+        </ThemeProvider>
+    );
+  }
 
   return (
-    <AntdApp>
-      <Layout style={{ minHeight: "100vh" }}>
-        <Navbar scrollToFooter={scrollToFooter} />
-        <Content>
-          {loading ? (
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: "calc(100vh - 64px - 70px)", // Adjust for Navbar and Footer height
-              }}
-            >
-              <Spinner />
-            </div>
-          ) : (
+      <ThemeProvider>
+        <div className="min-h-screen flex flex-col">
+          <Navbar scrollToFooter={scrollToFooter} />
+          <main className="flex-1 container py-6">
             <Routes>
               <Route
-                path="/"
-                element={
-                  <div
-                    style={{
-                      padding: 24,
-                      paddingBottom: 24,
-                      minHeight: 360,
-                      background: backgroundColor,
-                    }}
-                  >
-                    <Row>
-                      <Col xs={24} sm={8}>
-                        <Row
-                          style={{
-                            marginLeft: "25px",
-                            display: "flex",
-                            flexDirection: "row",
-                            gap: "10px",
-                          }}
-                        >
-                          <SampleDropdown setLoading={setLoading} />
-                          <UseShare />
-                        </Row>
-                      </Col>
-                      <Col span={18}>
-                        <Errors />
-                      </Col>
-                    </Row>
-                    <div
-                      style={{
-                        padding: 24,
-                        minHeight: 360,
-                        background: backgroundColor,
-                      }}
-                    >
-                      <ResizableContainer
-  leftPane={
-    <Collapse
-      defaultActiveKey={activePanel}
-      onChange={onChange}
-      items={panels}
-     style={{ marginBottom: "24px" }}
-    />
-  }
-  rightPane={<AgreementHtml loading={loading} isModal={false} />}
-  initialLeftWidth={66}
-  minLeftWidth={30}
-  minRightWidth={30}
-/>
-                    </div>
-                    <FloatingFAB />
-                  </div>
-                }
+                  path="/"
+                  element={
+                    <>
+                      {/* Header controls */}
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                        <div className="flex items-center gap-2">
+                          <Select value={sampleName} onValueChange={handleTemplateChange}>
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Select a template" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {samples.map((sample) => (
+                                  <SelectItem key={sample.NAME} value={sample.NAME}>
+                                    {sample.NAME}
+                                  </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={handleShare}
+                              className="gap-1.5"
+                          >
+                            <Share2 className="h-4 w-4" />
+                            Share
+                          </Button>
+                        </div>
+                        {error && <ErrorDisplay />}
+                      </div>
+
+                      {/* Editor layout */}
+                      <EditorLayout
+                          leftPane={<EditorTabs />}
+                          rightPane={<PreviewComponent loading={loading} />}
+                      />
+                    </>
+                  }
               />
-              <Route path="/learn" element={<LearnNow />}>
-                <Route path="intro" element={<LearnContent file="intro.md" />} />
-                <Route path="module1" element={<LearnContent file="module1.md" />} />
-                <Route path="module2" element={<LearnContent file="module2.md" />} />
-                <Route path="module3" element={<LearnContent file="module3.md" />} />
-              </Route>
+              <Route path="/learn/*" element={<LearnPage />} />
             </Routes>
-          )}
-        </Content>
-        <Footer />
-      </Layout>
-    </AntdApp>
+          </main>
+          <Footer />
+          <FloatingHelp />
+        </div>
+      </ThemeProvider>
   );
-};
-
-const Spinner = () => (
-  <div
-    style={{
-      flex: 1,
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <Spin
-      indicator={<LoadingOutlined style={{ fontSize: 42, color: "#19c6c7" }} spin />}
-    />
-  </div>
-);
-
-export default App;
+}

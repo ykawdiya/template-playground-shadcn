@@ -1,29 +1,79 @@
-@import "normalize.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-html,
-body {
-  font-family: "Rubik", Helvetica, Arial, sans-serif;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 190 92% 45%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 210 40% 96.1%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 190 92% 45%;
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 222.2 84% 4.9%;
+        --foreground: 210 40% 98%;
+        --card: 222.2 84% 4.9%;
+        --card-foreground: 210 40% 98%;
+        --popover: 222.2 84% 4.9%;
+        --popover-foreground: 210 40% 98%;
+        --primary: 190 92% 45%;
+        --primary-foreground: 222.2 47.4% 11.2%;
+        --secondary: 217.2 32.6% 17.5%;
+        --secondary-foreground: 210 40% 98%;
+        --muted: 217.2 32.6% 17.5%;
+        --muted-foreground: 215 20.2% 65.1%;
+        --accent: 217.2 32.6% 17.5%;
+        --accent-foreground: 210 40% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 217.2 32.6% 17.5%;
+        --input: 217.2 32.6% 17.5%;
+        --ring: 190 92% 45%;
+    }
 }
 
-html[data-theme="dark"] {
-    --bg-color: #121212;
-    --text-color: #ffffff;
-    --border-color: #444444;
-    --active-bg-color: #333333;
-    --active-text-color: #ffffff; 
-    --hover-bg-color: #444444;
-    --hover-text-color: #ffffff;
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings: "rlig" 1, "calt" 1;
+    }
 }
 
-html[data-theme="light"] {
-    --bg-color: #ffffff;
-    --text-color: #121212;
-    --border-color: #ddd;
-    --active-bg-color: #e0e0e0;
-    --active-text-color: #1b2540; 
-    --hover-bg-color: #e0e0e0;
-    --hover-text-color: #050c40;
+/* Add specialized styles for the editor and preview areas */
+.editor-pane {
+    @apply min-h-[300px] h-full;
+}
+
+.preview-pane {
+    @apply min-h-[300px] h-full;
+}
+
+/* Code highlighting styles */
+.hljs {
+    @apply bg-transparent;
+}
+
+/* Animation utilities */
+.animate-in {
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }

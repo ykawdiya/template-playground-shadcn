@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/navbar.tsx";
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
 
